@@ -33,5 +33,21 @@ kubectl get pods -n default
 # portforwarding for prometheus
 kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090
 
+# setup loki and promtail
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+helm install loki grafana/loki-stack --set grafana.enabled=false
+
+# setup grafana 
+helm install grafana grafana/grafana
+
+# check 
+kubectl get pods
+kubectl get svc
+
+# port forwarding
+kubectl port-forward svc/prometheus-grafana 3000:80 --address 0.0.0.0
+
 
 
