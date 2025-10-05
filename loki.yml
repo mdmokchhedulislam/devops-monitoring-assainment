@@ -151,7 +151,7 @@ metadata:
   name: promtail-config
   namespace: monitoring
 data:
-  config.yml: |
+  config.yaml: |
     server:
       http_listen_port: 9080
       grpc_listen_port: 0
