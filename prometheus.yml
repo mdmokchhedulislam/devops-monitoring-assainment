@@ -1,16 +1,10 @@
-# ===============================
-# Namespace
-# ===============================
+
 apiVersion: v1
 kind: Namespace
 metadata:
   name: monitoring
-
 ---
 
-# ===============================
-# Node Exporter (DaemonSet) + Service
-# ===============================
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -34,7 +28,6 @@ spec:
           limits:
             memory: 100Mi
             cpu: 100m
-
 ---
 apiVersion: v1
 kind: Service
@@ -45,16 +38,11 @@ spec:
   selector:
     app: node-exporter
   ports:
-    - port: 9100
-      targetPort: 9100
+  - port: 9100
+    targetPort: 9100
   type: ClusterIP
-
-
 ---
 
-# ===============================
-# Prometheus ConfigMap
-# ===============================
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -77,12 +65,8 @@ data:
       - job_name: 'nginx'
         static_configs:
           - targets: ['nginx.default.svc.cluster.local:80']
-
 ---
 
-# ===============================
-# Prometheus Deployment + Service
-# ===============================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -102,7 +86,7 @@ spec:
       - name: prometheus
         image: prom/prometheus:latest
         args:
-          - "--config.file=/etc/prometheus/prometheus.yml"
+        - "--config.file=/etc/prometheus/prometheus.yml"
         ports:
         - containerPort: 9090
         volumeMounts:
@@ -112,7 +96,6 @@ spec:
       - name: config-volume
         configMap:
           name: prometheus-config
-
 ---
 apiVersion: v1
 kind: Service
@@ -122,6 +105,6 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 9090
+  - port: 9090
   selector:
     app: prometheus
