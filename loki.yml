@@ -30,10 +30,22 @@ spec:
         volumeMounts:
         - name: loki-config
           mountPath: /etc/loki
+        - name: loki-index
+          mountPath: /loki/index
+        - name: loki-chunks
+          mountPath: /loki/chunks
+        - name: loki-wal
+          mountPath: /wal
       volumes:
       - name: loki-config
         configMap:
           name: loki-config
+      - name: loki-index
+        emptyDir: {}
+      - name: loki-chunks
+        emptyDir: {}
+      - name: loki-wal
+        emptyDir: {}
 ---
 # Loki ConfigMap
 apiVersion: v1
