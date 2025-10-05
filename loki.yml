@@ -125,7 +125,7 @@ spec:
       - name: promtail
         image: grafana/promtail:2.8.0
         args:
-          - "-config.file=/etc/promtail/promtail-config.yaml"
+          - "-config.file=/etc/promtail/config.yaml"
         volumeMounts:
           - name: promtail-config
             mountPath: /etc/promtail
@@ -145,14 +145,13 @@ spec:
           hostPath:
             path: /var/lib/docker/containers
 ---
-# 🟦 Promtail ConfigMap
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: promtail-config
   namespace: monitoring
 data:
-  promtail-config.yaml: |
+  config.yml: |
     server:
       http_listen_port: 9080
       grpc_listen_port: 0
@@ -161,42 +160,13 @@ data:
       filename: /tmp/positions.yaml
 
     clients:
-      - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+      - url: http://loki:3100/loki/api/v1/push
 
     scrape_configs:
-      # 🔸 1. System logs (var/log)
-      - job_name: system
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: varlogs
-              host: ${HOSTNAME}
-              __path__: /var/log/*.log
-
-      # 🔸 2. Nginx logs (if nginx runs directly on node)
-      - job_name: nginx-logs
+      - job_name: kubernetes-pods
         static_configs:
           - targets:
               - localhost
             labels:
               job: nginx
-              host: ${HOSTNAME}
-              __path__: /var/log/nginx/*.log
-
-      # 🔸 3. Kubernetes pods logs
-      - job_name: kubernetes-pods
-        kubernetes_sd_configs:
-          - role: pod
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_label_app]
-            target_label: app
-          - source_labels: [__meta_kubernetes_pod_node_name]
-            target_label: node
-          - source_labels: [__meta_kubernetes_pod_container_name]
-            target_label: container
-          - source_labels: [__meta_kubernetes_pod_namespace]
-            target_label: namespace
-          - source_labels: [__meta_kubernetes_pod_container_name]
-            target_label: __path__
-            replacement: /var/log/containers/*$1*.log
+              __path__: /var/log/containers/*nginx*.log
