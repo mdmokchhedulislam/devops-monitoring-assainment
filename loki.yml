@@ -170,9 +170,9 @@ data:
           - targets:
               - localhost
             labels:
-              job: nginx
+              job: varlogs
               host: ${HOSTNAME}
-              __path__: /var/log/nginx/*.log
+              __path__: /var/log/*.log
 
       # 🔸 2. Nginx logs (if nginx runs directly on node)
       - job_name: nginx-logs
