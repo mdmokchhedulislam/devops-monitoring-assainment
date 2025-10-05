@@ -172,7 +172,8 @@ data:
           - targets:
               - localhost
             labels:
-              app: nginx
+              job: nginx
+              host: localhost
               __path__: /var/log/nginx/*.log
       - job_name: kubernetes-pods
         kubernetes_sd_configs:
